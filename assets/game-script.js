@@ -10,7 +10,7 @@ const COLOR_OPTIONS_ARRAY = [
     YELLOW_COLOR_OPTION
 ];
 
-const ARRAY_COLOR_STEPS_LIMIT = 5;
+let ARRAY_COLOR_STEPS_LIMIT = 2;
 
 let colorArray = [];
 let userSteps = 0;
@@ -21,10 +21,20 @@ async function startGame(){
    await makeRandomColorArray();
    await showToUserColorArray();
 }
+
+function continueGame(){
+    userSteps = 0;
+    userCanPlay = false;
+    hideFeedback();
+    ARRAY_COLOR_STEPS_LIMIT = ARRAY_COLOR_STEPS_LIMIT+1;
+    startGame();
+}
+
 function restartGame(){
     userSteps = 0;
     userCanPlay = false;
     hideFeedback();
+    ARRAY_COLOR_STEPS_LIMIT = 2;
     startGame();
 }
 
@@ -54,6 +64,7 @@ function showToUserColorArray(){
                 elementSelected.classList.remove(fullopacityClass);
             
                 if(i === colorArray.length-1){
+                    showYourTurn();
                     userCanPlay = true;
                     gameControlsElement.style.pointerEvents = "all";
                 }
@@ -71,7 +82,7 @@ function checkUserStep(elementId){
         }
         else{
             showSuccessFeedback();
-            setGameToRestart();
+            setGameToContinue();
         }
         userSteps++;
     }
@@ -87,6 +98,13 @@ function hideFeedback(){
     const messageToUserElement = document.getElementById(MESSAGE_TO_USER_ELEMENT_ID);
 
     messageToUserElement.textContent = "";
+}
+
+function showYourTurn(){
+    const MESSAGE_TO_USER_ELEMENT_ID = "message-to-user";
+    const messageToUserElement = document.getElementById(MESSAGE_TO_USER_ELEMENT_ID);
+
+    messageToUserElement.textContent = "Tu turno";
 }
 
 function showSuccessFeedback(){
@@ -120,9 +138,25 @@ function setGameToRestart(){
     gameControlsElement.style.pointerEvents = "none";
     showElement(startGameButtonElement);
     startGameButtonElement.textContent = "Reiniciar";
-
+    
     startGameButtonElement.onclick = function() {
         restartGame();
+    }
+}
+
+function setGameToContinue(){
+    const gameControlsElementId = "game-controls-element";
+    const startGameButtonElementId = "start-game";
+
+    const startGameButtonElement = document.getElementById(startGameButtonElementId);
+    const gameControlsElement = document.getElementById(gameControlsElementId);
+
+    gameControlsElement.style.pointerEvents = "none";
+    showElement(startGameButtonElement);
+    startGameButtonElement.textContent = "Siguiente nivel";
+    
+    startGameButtonElement.onclick = function() {
+        continueGame();
     }
 }
 
@@ -158,15 +192,32 @@ function setColorButtonEventListeners(){
     }
 }
 
+//funcion sonido al boton comenzar
+/*function startSound(){
+    let boton = document.getElementById("start-game")
+
+    boton.addEventListener("click", () => {
+      let etiquetaAudio = document.createElement("audio")
+      etiquetaAudio.setAttribute("src", "./boing.mp3")
+      etiquetaAudio.play()
+    })
+}*/
+
+//funcion para reproducir sonido
+function showToUserColorArraySound(){
+}
+
 function main(){
     const startGameButton = document.getElementById('start-game');
+    startGameButton.style.pointerEvents = "all";
     startGameButton.addEventListener('click', () => {
-        startGame()
+        startGame();
         //ocultamos el boton de start
         hideElement(startGameButton);
     })
     //Definir eventos para escuchar las interacciones del user
     setColorButtonEventListeners();
+    
 }
 
 main();
